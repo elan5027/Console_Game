@@ -13,9 +13,11 @@ import random
 def ending(num):
     print("게임 Over")
     if num == 0:
-        print("출몰한 늑대한태 뜯겨 사망")
+        print("몬스터에 의하여 사망하였습니다.")
+        exit(0)
     if num == 1:
         print("다양한 이유")
+        exit(0)
     time.sleep(2)
     os.system('cls||clear')
 
@@ -36,10 +38,14 @@ def start():
     print("1. 이곳에서 아침을 기다린다.")
     print("2. 사람이 지나다니는 걸로 보이는 길을 따라 나선다")
     i = choice("start")
-    if i == '1':
-        return ending(0)
-
     time.sleep(1.5)
+    if i == '1':
+        print("주변에서 많은 기척이 느껴진다.")
+        for i in range(3):
+            start_battle(user)
+            print("지금이라도 자리를 벗어날까?")
+            if check_yesno():
+                break
 
     print("어딜 봐도 모두 다 비슷해 보인다.")
     print("이동하기 전에 길을 해매지 않으려면 표시를 남겨야 할것 같다.")
@@ -166,39 +172,42 @@ def check_yesno():
 def create_monster():
     doc = {2: "Wolf", 3: "bear", 4: "tiger"}
     level = random.randint(2, 4)
-    hp = random.randint((50*level), 80*level)
-    attack = (level*3)+3
-    return chaticter.CreateMonster(doc[level], hp, attack)
+    return chaticter.CreateMonster(doc[level], level)
 
 
 def start_battle(user):
     monster = create_monster()
-    print(f"숲을 거닐던 {monster.name}를 마주쳣다.")
+    print(f"{monster.name}와 전투를 시작한다.")
     os.system("pause")
     while (True):
-        os.system('cls||clear')
-        print(f"{user.name} HP : {user.hp}")
-        print(f"{monster.name} HP : {monster.hp}\n")
+        if user.alive():
+            os.system('cls||clear')
+            print(f"{user.name} HP : {user.hp}")
+            print(f"{monster.name} HP : {monster.hp}\n")
 
-        print("1. 일반 공격")
-        print("2. 동작이 큰 공격")
-        cmd = input("어떻게 할까? >> ")
-        if cmd == '1':
-            user.attack(monster)
-        elif cmd == '2':
-            print("현재 공격의 성공 확률은 ", (user.condition /
-                                     user.max_condition)*100, "% 입니다.")
-            if check_yesno():
-                user.high_risk_attack(monster)
-        else:
-            print("잘못된 입력입니다.")
-            os.system("pause")
-            continue
+            print("1. 일반 공격")
+            print("2. 동작이 큰 공격")
+            cmd = input("어떻게 할까? >> ")
+            if cmd == '1':
+                user.attack(monster)
+            elif cmd == '2':
+                print("현재 공격의 성공 확률은 ", (user.condition /
+                                         user.max_condition)*100, "% 입니다.")
+                if check_yesno():
+                    user.high_risk_attack(monster)
+            else:
+                print("잘못된 입력입니다.")
+                os.system("pause")
+                continue
 
-        if user.hp <= 0 or monster.hp <= 0:
-            return 0
-        else:
-            monster.attack(user)
-            if user.hp <= 0 or monster.hp <= 0:
+            if user.alive() and monster.alive():
+                monster.attack(user)
+            elif monster.alive() == False:
+                print("전투의 경험으로 능력치가 상승합니다.")
+                user.levelup(monster.level)
+                # 경험치 or 아이템 드랍 코드 가능
+                os.system("pause")
                 return 0
+        else:
+            return ending(0)
         os.system("pause")

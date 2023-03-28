@@ -3,6 +3,12 @@ import random
 
 class Character:
 
+    def alive(self):
+        if self.hp > 0:
+            return True
+        else:
+            return False
+
     def attack(self, other):
         # 공격력 범위 내에서 랜덤한 데미지를 계산
         damage = random.randint(self.power - 2, self.power + 2)
@@ -43,7 +49,7 @@ class CreateUser(Character):
 
     def high_risk_attack(self, other):
         # 공격력 범위 내에서 랜덤한 데미지를 계산
-        damage = int(random.randint(self.power, self.power+20))
+        damage = int(random.randint(self.power, self.power+25))
         # 랜덤한 위험도를 계산하고 출력
         risk = random.randint(0, self.max_condition)
         print(f"{risk} {self.name}는 위험을 무릎쓰고 동작이 큰 공격을 시도했다.")
@@ -70,12 +76,18 @@ class CreateUser(Character):
         print(f"Condition {self.condition}/{self.max_condition}")
         print(f"Power {self.power}")
 
+    def levelup(self, level):
+        self.max_hp += level*3
+        self.max_condition += level*2
+        self.power += level
+
 
 class CreateMonster(Character):
 
-    def __init__(self, name, max_hp, power):
+    def __init__(self, name, level):
         # 이름, 최대 체력, 현재 체력, 공격력을 초기화
         self.name = name
-        self.hp = max_hp
-        self.max_hp = max_hp
-        self.power = power
+        self.level = level
+        self.hp = random.randint((50*level), 80*level)
+        self.max_hp = self.hp
+        self.power = (level*3)+3
